@@ -1,11 +1,16 @@
 const express = require('express');
-const { route } = require('express/lib/application');
+const cookieParser = require('cookie-parser');
+//const { route } = require('express/lib/application');
 const port = 8080;
 const expressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 const app = express();
+
+app.use(express.urlencoded());
+app.use(cookieParser());
+
 
 app.use(express.static('./assets'))
 app.use(expressLayouts);

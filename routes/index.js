@@ -5,7 +5,7 @@ const homeController = require('../controllers/home_controller');
 const usersController = require('../controllers/users_controller');
 
 
-console.log('File is loaded');
+//console.log('File is loaded');
 router.get('/', homeController.home);
 router.use('/users', require('./users'));
 
