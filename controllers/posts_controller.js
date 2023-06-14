@@ -1,5 +1,5 @@
 const Post = require('../models/post');
-
+const Comment = require('../models/comment');
 
 module.exports.create =async function(req, res){
     try{
@@ -7,9 +7,38 @@ module.exports.create =async function(req, res){
             content: req.body.content,
             user: req.user._id,
         });
+
+        
+        req.flash('success', 'Post created successfully');
         return res.redirect('back');
     }catch(err){
-        console.log('error in creating post', err);
-        return;
+       // console.log('error in creating post', err);
+        req.flash('error', err);
+        return res.redirect('back');    
     }
 };
+
+module.exports.destroy = async function(req, res){
+    try{
+         // .id means converting the object id into the string
+        let post = await Post.findById(req.params.id)
+
+        if(post.user == req.user.id){
+            post.deleteOne();
+            
+            try{
+                await Comment.deleteMany({post: req.params.id});
+                req.flash('success', 'Post and associated comments deleted!');
+                return res.redirect('back');
+            }catch(err){
+               // console.log('error in deleting post', err);
+                req.flash('error', err);
+                return res.redirect('back');
+            }
+        }
+    }catch(err){
+        //console.log('error in destroying post', err);
+        req.flash('error', 'You can not delete this post');
+        return res.redirect('back');
+    } 
+}

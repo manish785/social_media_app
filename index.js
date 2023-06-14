@@ -3,7 +3,7 @@ const express = require('express');
 // are small pieces of data stored on the client's browser and are used to maintain state and store user information. 
 const cookieParser = require('cookie-parser');
 //const { route } = require('express/lib/application');
-const port = 8080;
+const port = 8000;
 const app = express();
 const db = require('./config/mongoose')
 const expressLayouts = require('express-ejs-layouts');
@@ -15,8 +15,8 @@ const passport = require('passport');
 const passportLocal = require('./config/passport-local-strategy');
 const MongoStore = require('connect-mongo');
 const sassMiddleware = require('node-sass-middleware');
-
-
+const flash = require('connect-flash');
+const customMware = require('./config/middleware');
 
 app.use(sassMiddleware({
     src: './assets/scss',
@@ -75,6 +75,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(passport.setAuthenticatedUser);
+
+app.use(flash());
+app.use(customMware.setFlash);
 
 // use express router
 app.use('/', require('./routes'));
