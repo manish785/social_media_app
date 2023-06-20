@@ -3,9 +3,9 @@ const express = require('express');
 // are small pieces of data stored on the client's browser and are used to maintain state and store user information. 
 const cookieParser = require('cookie-parser');
 //const { route } = require('express/lib/application');
-const port = 8000;
+const port = 8080;
 const app = express();
-const db = require('./config/mongoose')
+const db = require('./config/mongoose');
 const expressLayouts = require('express-ejs-layouts');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
