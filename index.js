@@ -3,7 +3,7 @@ const express = require('express');
 // are small pieces of data stored on the client's browser and are used to maintain state and store user information. 
 const cookieParser = require('cookie-parser');
 //const { route } = require('express/lib/application');
-const port = 8080;
+const port = 8000;
 const app = express();
 const db = require('./config/mongoose');
 const expressLayouts = require('express-ejs-layouts');
@@ -13,6 +13,8 @@ const dotenv = require('dotenv');
 const session = require('express-session');
 const passport = require('passport');
 const passportLocal = require('./config/passport-local-strategy');
+const passportGoogle = require('./config/passport-google-oauth2-strategy');
+
 const passportJWT = require('./config/passport-jwt-strategy');
 const MongoStore = require('connect-mongo');
 const sassMiddleware = require('node-sass-middleware');
