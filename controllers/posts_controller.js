@@ -32,6 +32,8 @@ module.exports.destroy = async function(req, res){
         let post = await Post.findById(req.params.id)
 
         if(post.user == req.user.id){
+            console.log(post.user);
+            console.log(req.user.id);
             post.deleteOne();
             
             try{

@@ -6,6 +6,7 @@ const postSchema = new mongoose.Schema({
         required: true
     },
     user:{
+        // here, linking the POST with the User Id
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },

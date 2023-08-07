@@ -3,6 +3,7 @@ const User = require('../models/user')
 module.exports.profile = async function(req, res){
     try{
       let user = await User.findById(req.params.id)
+      console.log(req.params.id);
         return res.render('user_profile',{
             title: 'User Profile',
             profile_user: user,
@@ -16,12 +17,13 @@ module.exports.profile = async function(req, res){
 module.exports.update = async function(req, res){
       if(req.user.id == req.params.id){
         try{
+        // by passing the req.body, we can update the fields which we want to update
         let user = await User.findByIdAndUpdate(req.params.id, req.body);
            return res.redirect('back');
       }
     catch(err){
-       req.flash('error',err);
-           return res.redirect('back');
+        req.flash('error',err);
+        return res.redirect('back');
     }
   }else{
       req.flash('error', 'Unauthorized!');
@@ -33,7 +35,7 @@ module.exports.update = async function(req, res){
 module.exports.signUp = function(req, res){
     // If the user is signed in, then hittig this Sign Up route, will render to the users profile
     if(req.isAuthenticated()){
-      return res.redirect('/users/profile');
+      return res.redirect('/users/profile/:id');
     }
 
     return res.render('user_sign_up', {
@@ -45,7 +47,7 @@ module.exports.signUp = function(req, res){
 module.exports.signIn = function(req, res){
     // If the user is signed in, then hittig this Sign In route, will render to the users profile
     if(req.isAuthenticated()){
-      return res.redirect('/users/profile');
+      return res.redirect('/users/profile/:id');
     }
 
     return res.render('user_sign_in', {
@@ -62,6 +64,7 @@ module.exports.create = async function(req, res) {
     try {
       const user = await User.findOne({ email: req.body.email });
       if (!user) {
+        // when we will create a new user, it will render towards the users's sign in page
         await User.create(req.body);
         return res.redirect('/users/sign-in');
       } else {
@@ -83,6 +86,7 @@ module.exports.createSession = function(req, res){
 
 
 module.exports.destroySession = function(req, res){
+  //this functionality provides by passport.js (req.logout)
   req.logout(function(err){
     if(err){
       console.log('Error in logging out', err);

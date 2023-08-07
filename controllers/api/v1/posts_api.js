@@ -49,6 +49,7 @@ module.exports.destroy = async function(req, res){
                 message: "Post and associated comments deleted successfully!",
             })
         }else{
+            // this case will handle will the unauthorized user, only authorized users can delete the post
             return res.json(401, {
                 message: 'You can not delete this post!'
             })

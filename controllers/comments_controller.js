@@ -40,6 +40,7 @@ module.exports.create = async function(req, res){
       if (post) {
         var comment = await Comment.create({
           content: req.body.content,
+          // here, linking comment through postId and userId
           post: req.body.post,
           user: req.user._id,
         });

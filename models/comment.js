@@ -6,10 +6,12 @@ const commentSchema = new mongoose.Schema({
         required: true
     },
     //comment belongs to a user
+    // here, linking the comment with the user
     user:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    // here , linking the comment to the post
     post: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Post'
