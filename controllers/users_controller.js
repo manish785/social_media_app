@@ -3,11 +3,10 @@ const User = require('../models/user')
 module.exports.profile = async function(req, res){
     try{
       let user = await User.findById(req.params.id)
-      console.log(req.params.id);
-        return res.render('user_profile',{
-            title: 'User Profile',
-            profile_user: user,
-        });
+      return res.render('user_profile',{
+          title: 'User Profile',
+          profile_user: user,
+      });
     }catch(err){
       console.log(err);
       return res.redirect('back');
@@ -35,7 +34,7 @@ module.exports.update = async function(req, res){
 module.exports.signUp = function(req, res){
     // If the user is signed in, then hittig this Sign Up route, will render to the users profile
     if(req.isAuthenticated()){
-      return res.redirect('/users/profile/:id');
+      return res.redirect('/users/profile/' + req.user._id);
     }
 
     return res.render('user_sign_up', {
@@ -44,12 +43,11 @@ module.exports.signUp = function(req, res){
 }
 
 // render the sign in page
-module.exports.signIn = function(req, res){
-    // If the user is signed in, then hittig this Sign In route, will render to the users profile
+module.exports.signIn = async function(req, res){
+        
     if(req.isAuthenticated()){
-      return res.redirect('/users/profile/:id');
+      return res.redirect('/users/profile/' + req.user._id);
     }
-
     return res.render('user_sign_in', {
         title: 'Codeial | Sign In',
    });
@@ -58,30 +56,41 @@ module.exports.signIn = function(req, res){
 // get the sign up data
 module.exports.create = async function(req, res) {
     if (req.body.password != req.body.confirm_password) {
-      return res.redirect('back');
+      return res.status(400).json({
+        message: 'Password and confirm password do not match'
+      })
     }
   
     try {
       const user = await User.findOne({ email: req.body.email });
-      if (!user) {
-        // when we will create a new user, it will render towards the users's sign in page
-        await User.create(req.body);
-        return res.redirect('/users/sign-in');
-      } else {
-        return res.redirect('back');
+      if(user){
+        return res.status(409).json(({
+          message: 'User already exits in the DB'
+        }))
       }
+      // when we will create a new user, it will render towards the users's sign in page
+      await User.create(req.body);
+      return res.redirect('/users/sign-in');
     } catch (err) {
       console.log('error in signing up:', err);
       // Handle the error appropriately
       return res.redirect('back');
     }
-  };
-  
+}
 
 // sign in and create a session for the user
-module.exports.createSession = function(req, res){
-    req.flash('success', 'Logged in successfully');
-    return res.redirect('/');
+module.exports.createSession = async function(req, res){
+    const {email, password} = req.body;
+   
+    try{
+      const user = await User.matchPasswordAndGenerateToken(email, password);
+      req.flash('success', 'Logged in successfully');
+      return res.redirect(`/users/profile/${user._id}`);
+    }catch(err){
+      console.log('error', err);
+      return res.redirect('/users/sigin-in'); 
+
+    }
 }
 
 
@@ -93,6 +102,6 @@ module.exports.destroySession = function(req, res){
       return;
     }
     req.flash('success', 'You have logged out!');
-    return res.redirect('/');
+    return res.redirect('/users/sign-up');
   });
 }

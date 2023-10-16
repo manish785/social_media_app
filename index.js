@@ -14,8 +14,8 @@ const session = require('express-session');
 const passport = require('passport');
 const passportLocal = require('./config/passport-local-strategy');
 const passportGoogle = require('./config/passport-google-oauth2-strategy');
-
 const passportJWT = require('./config/passport-jwt-strategy');
+
 const MongoStore = require('connect-mongo');
 const sassMiddleware = require('node-sass-middleware');
 const flash = require('connect-flash');
@@ -37,25 +37,23 @@ app.use(cookieParser());
 app.use(express.static('./assets'))
 app.use(expressLayouts);
 
+// connection to the DB
 dotenv.config();
 mongoose.connect(process.env.MONGO_URL)
 .then(()=>console.log("DB connection Succesful")).catch((err)=>{
     console.log(err);
 });
 
-
 // extract style and scripts from sub pages into the layout
 app.set('layout extractStyles', true);
 app.set('layout extractScripts', true);
-
-
 
 // set up the view engine
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
 
-// mongod store is used to store the session cookie in the db
+// mongoo store is used to store the session cookie in the db
 app.use(session({
     // TODO: change the secret before deployment in production code
     secret: 'blahsomething',
