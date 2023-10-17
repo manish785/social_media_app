@@ -7,7 +7,7 @@ const usersController = require('../controllers/users_controller');
 // console.log('hiiii', passport);
 
 router.get('/profile/:id', usersController.profile);
-router.post('/update/:id', usersController.update);
+router.get('/update/:id', usersController.update);
 
 
 router.get('/sign-up', usersController.signUp);

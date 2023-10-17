@@ -1,9 +1,14 @@
-const User = require('../models/user')
+const User = require('../models/user');
+const { validateToken } = require('../services/authentication')
+
 
 module.exports.profile = async function(req, res){
+   const token = req.cookies.token;
     try{
+      validateToken(token);
+
       let user = await User.findById(req.params.id)
-      return res.render('user_profile',{
+      return res.status(200).render('user_profile',{
           title: 'User Profile',
           profile_user: user,
       });
@@ -14,20 +19,35 @@ module.exports.profile = async function(req, res){
 }
 
 module.exports.update = async function(req, res){
-      if(req.user.id == req.params.id){
+    
         try{
-        // by passing the req.body, we can update the fields which we want to update
-        let user = await User.findByIdAndUpdate(req.params.id, req.body);
-           return res.redirect('back');
-      }
-    catch(err){
-        req.flash('error',err);
-        return res.redirect('back');
-    }
-  }else{
-      req.flash('error', 'Unauthorized!');
-      return res.status(401).send('Unauthorized'); 
-  }
+          validateToken(token);
+
+          let user=await User.findById(req.params.id);
+          User.uploadedAvatar(req,res,function(err){
+              if(err){
+                  console.log('******Multer Error:',err);
+              }
+              user.name=req.body.name;
+              user.email=req.body.email;
+              if(req.file){
+                 
+                //  if(user.avatar){
+                //      fs.unlinkSync(path.join(__dirname,'..',user.avatar));
+                //  }
+                 
+                 
+                 user.avatar=User.avatarPath+'/'+req.file.filename;
+
+              }
+              user.save();
+              return res.redirect('back');
+          })
+        }
+         catch(err){
+            req.flash('error',err);
+            return res.redirect('back');
+        }
 }
 
 // render the sign up page
@@ -57,7 +77,7 @@ module.exports.signIn = async function(req, res){
 module.exports.create = async function(req, res) {
     if (req.body.password != req.body.confirm_password) {
       return res.status(400).json({
-        message: 'Password and confirm password do not match'
+        message: 'Password and Confirm Password do not match'
       })
     }
   
@@ -83,9 +103,12 @@ module.exports.createSession = async function(req, res){
     const {email, password} = req.body;
    
     try{
-      const user = await User.matchPasswordAndGenerateToken(email, password);
-      req.flash('success', 'Logged in successfully');
-      return res.redirect(`/users/profile/${user._id}`);
+      const token = await User.matchPasswordAndGenerateToken(email, password);
+      const data = res.cookie("token", token);
+      return res.status(200).json({
+        message: 'User Login in Successfully',
+        data
+      })
     }catch(err){
       console.log('error', err);
       return res.redirect('/users/sigin-in'); 
@@ -102,6 +125,6 @@ module.exports.destroySession = function(req, res){
       return;
     }
     req.flash('success', 'You have logged out!');
-    return res.redirect('/users/sign-up');
+    return res.status(200).redirect('/users/sign-up');
   });
 }
