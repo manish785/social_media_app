@@ -65,9 +65,9 @@ module.exports.signUp = function(req, res){
 // render the sign in page
 module.exports.signIn = async function(req, res){
         
-    if(req.isAuthenticated()){
-      return res.redirect('/users/profile/' + req.user._id);
-    }
+    // if(req.isAuthenticated()){
+    //   return res.redirect('/users/profile/' + req.user._id);
+    // }
     return res.render('user_sign_in', {
         title: 'Codeial | Sign In',
    });
@@ -104,11 +104,13 @@ module.exports.createSession = async function(req, res){
    
     try{
       const token = await User.matchPasswordAndGenerateToken(email, password);
-      const data = res.cookie("token", token);
-      return res.status(200).json({
+      return res.cookie("token", token).json({
         message: 'User Login in Successfully',
-        data
       })
+      // return res.status(200).json({
+      //   message: 'User Login in Successfully',
+      //   data: data
+      // })
     }catch(err){
       console.log('error', err);
       return res.redirect('/users/sigin-in'); 

@@ -1,26 +1,63 @@
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const secret = 'Manish@9876';
 
-module.exports.create =async function(req, res){
+
+
+module.exports.usersCreatePost = async (req, res) => {
+    const token = req.cookies.token;
+
+    try {
+        if (!token) {
+            throw new Error('Token is missing');
+        }
+        const decoded = jwt.verify(token, secret);
+        const user = await User.findOne( {email : decoded.email})
+    
+        if (!user) {
+            throw new Error('User data is missing in the token');
+        }
+
+        return res.render('user_create_post', {
+            user,
+            title: 'Create Post',
+        });
+    } catch (err) {
+        console.log('error', err);
+        return res.status(401).json({ error: 'Token is invalid or expired' });
+    }
+};
+
+
+module.exports.postCreate = async (req, res) => {
+    const token = req.cookies.token;
+    
     try{
-        let post = await Post.create({
-            content: req.body.content,
-            user: req.user._id,
+        const { content } = req.body;
+        if (!token) {
+            throw new Error('Token is missing');
+        }
+
+        const decoded = jwt.verify(token, secret);
+        const user = await User.findOne( {email : decoded.email})
+        if (!user) {
+            throw new Error('User data is missing in the token');
+        }
+
+        const post = await Post.create({
+            content,
+            user: user._id,
         });
         
-        if(req.xhr){
-            return res.status(200).json({
-                data:{
-                    post: post
-                },
-                message: 'Post created successfully!'
-            })
-        }
-        
-        req.flash('success', 'Post created successfully');
-        return res.redirect('back');
+        return res.status(200).json({
+            data:{
+                post: post
+            },
+            message: 'Post created successfully!'
+        })
     }catch(err){
-       // console.log('error in creating post', err);
         req.flash('error', err);
         return res.redirect('back');    
     }

@@ -21,6 +21,8 @@ module.exports.home = async function(req, res){
             }
         })
         .exec() 
+        
+        // console.log('manish', posts);
 
         let users = await User.find({});
         return res.render('home', {
