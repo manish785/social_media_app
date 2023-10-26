@@ -49,6 +49,7 @@ userSchema.static('matchPasswordAndGenerateToken',
     const salt = user.salt;
     const hashedPassword = user.password;
 
+    // here the user salt will be used
     const userProvidedHashed = createHmac('sha256', salt).update(password).digest('hex');
     
     if(hashedPassword != userProvidedHashed){

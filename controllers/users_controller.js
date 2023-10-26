@@ -18,45 +18,94 @@ module.exports.profile = async function(req, res){
     }
 }
 
-module.exports.update = async function(req, res){
-    
-        try{
-          validateToken(token);
+// module.exports.update = async function(req, res){
 
-          let user=await User.findById(req.params.id);
-          User.uploadedAvatar(req,res,function(err){
-              if(err){
-                  console.log('******Multer Error:',err);
-              }
-              user.name=req.body.name;
-              user.email=req.body.email;
-              if(req.file){
-                 
-                //  if(user.avatar){
-                //      fs.unlinkSync(path.join(__dirname,'..',user.avatar));
-                //  }
-                 
-                 
-                 user.avatar=User.avatarPath+'/'+req.file.filename;
+//   /* if(req.user.id == req.params.id){
+//        User.findByIdAndUpdate(req.params.id, req.body, function(err, user){
+//            req.flash('success', 'Updated!');
+//            return res.redirect('back');
+//        });
+//    }else{
+//        req.flash('error', 'Unauthorized!');
+//        return res.status(401).send('Unauthorized');
+//    }*/
+//    let user = await User.findById(req.params.id);
+//    console.log('manish', user);
+//    if(user._id == req.params.id){
+//        console.log('manish kumar', user);
+//        try{
+//             await User.uploadedAvatar(req,res,function(err){
+//                 if(err){
+//                     console.log('******Multer Error:',err);
+//                 }
+//                 user.name=req.body.name;
+//                 user.email=req.body.email;
+//                 if(req.file){
+                   
+//                   //  if(user.avatar){
+//                   //      fs.unlinkSync(path.join(__dirname,'..',user.avatar));
+//                   //  }
+                   
+                   
+//                    user.avatar=User.avatarPath+'/'+req.file.filename;
 
-              }
-              user.save();
-              return res.redirect('back');
-          })
-        }
-         catch(err){
-            req.flash('error',err);
-            return res.redirect('back');
-        }
+//                 }
+//                 console.log('manish mishra', user);
+//                 user.save();
+//                 return res.redirect('back');
+//             })
+//        }catch(err){
+//            req.flash('error',err);
+//            return res.redirect('back');
+//        }
+//    }else{
+//        req.flash('error', 'Unauthorized!');
+//        return res.status(401).send('Unauthorized'); 
+//    }
+// }
+
+module.exports.updateProfile = async function(req, res){
+      const token = req.cookies.token;
+      validateToken(token);
+
+      let user = await User.findById(req.params.id)
+
+      return res.render('user_update_profile', {
+          title: 'User Profile',
+          profile_user: user
+    });
 }
+
+
+
+module.exports.update = async function (req, res) {
+  try {
+      // Update the user based on the form data
+      const user = await User.findById(req.params.id);
+
+      // Check for user authorization here if needed
+
+      user.name = req.body.name;
+      user.email = req.body.email;
+      
+      console.log('manish thakur', user);
+      if (req.file) {
+          // Update the user's avatar if a new file is uploaded
+          user.avatar = User.avatarPath + '/' + req.file.filename;
+      }
+
+      await user.save();
+      req.flash('success', 'Profile updated successfully');
+      return res.redirect('back');
+  } catch (err) {
+      req.flash('error', err);
+      return res.redirect('back');
+  }
+};
 
 // render the sign up page
 module.exports.signUp = function(req, res){
-    // If the user is signed in, then hittig this Sign Up route, will render to the users profile
-    if(req.isAuthenticated()){
-      return res.redirect('/users/profile/' + req.user._id);
-    }
-
+  
     return res.render('user_sign_up', {
         title: 'Codeial | Sign Up',
    });
@@ -65,9 +114,10 @@ module.exports.signUp = function(req, res){
 // render the sign in page
 module.exports.signIn = async function(req, res){
         
-    // if(req.isAuthenticated()){
-    //   return res.redirect('/users/profile/' + req.user._id);
-    // }
+    if(req.isAuthenticated()){
+      return res.redirect('/users/profile/' + req.user._id);
+    }
+
     return res.render('user_sign_in', {
         title: 'Codeial | Sign In',
    });
@@ -119,14 +169,22 @@ module.exports.createSession = async function(req, res){
 }
 
 
-module.exports.destroySession = function(req, res){
+module.exports.destroySession = async function(req, res){
   //this functionality provides by passport.js (req.logout)
-  req.logout(function(err){
-    if(err){
-      console.log('Error in logging out', err);
-      return;
+
+     // Clear the user's session data
+    try{
+        req.session.destroy(err => {
+          if (err) {
+            console.error('Error in logging out:', err);
+            return;
+          }
+          // Redirect to the home page or any other destination after logout
+          // req.flash('success', 'You have logged out!');
+          return res.status(200).redirect('/users/sign-up');
+        });
+    }catch(err){
+          console.log('error', err);
+          return res.redirect('back');
     }
-    req.flash('success', 'You have logged out!');
-    return res.status(200).redirect('/users/sign-up');
-  });
 }
