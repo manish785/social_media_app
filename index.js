@@ -2,6 +2,7 @@ const express = require('express');
 // It middleware that helps parse HTTP cookies in incoming requests.When a client sends a request to a server, it can include cookies as part of the request headers. Cookies
 // are small pieces of data stored on the client's browser and are used to maintain state and store user information. 
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 //const { route } = require('express/lib/application');
 const port = 8000;
 const app = express();
@@ -79,6 +80,8 @@ app.use(passport.setAuthenticatedUser);
 
 app.use(flash());
 app.use(customMware.setFlash);
+
+app.use(bodyParser.json());
 
 // use express router
 app.use('/', require('./routes'));

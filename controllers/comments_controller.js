@@ -102,9 +102,47 @@ module.exports.create = async function(req, res){
     } catch (err) {
       console.log('error', err);
       return;
-    }
+    }      
+}
+
+module.exports.getComment = async function(req, res){
+
+    try {
+      const comment = await Comment.findById(req.params.id);
     
-     
+      return res.status(200).json({
+        data: {
+          comment: comment.content,
+        },
+        message: "Comment Fetched Successfully!",
+      });
+    } catch (err) {
+      console.log('error', err);
+      return;
+    }      
+}
+
+module.exports.updateComment = async function(req, res){
+
+  try {
+    const { content } = req.body;
+    const comment = await Comment.findById(req.params.id);
+
+    if(comment){
+      comment.content = content;
+      
+      return res.status(200).json({
+        data: {
+          comment: comment.content,
+        },
+        message: "Comment Fetched Successfully!",
+      });
+    }
+
+  } catch (err) {
+    console.log('error', err);
+    return;
+  }      
 }
 
 module.exports.destroy = async function(req, res){

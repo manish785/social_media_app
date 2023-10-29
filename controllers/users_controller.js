@@ -4,7 +4,8 @@ const { validateToken } = require('../services/authentication')
 
 module.exports.profile = async function(req, res){
    const token = req.cookies.token;
-    try{
+
+   try{
       validateToken(token);
 
       let user = await User.findById(req.params.id)
@@ -18,51 +19,6 @@ module.exports.profile = async function(req, res){
     }
 }
 
-// module.exports.update = async function(req, res){
-
-//   /* if(req.user.id == req.params.id){
-//        User.findByIdAndUpdate(req.params.id, req.body, function(err, user){
-//            req.flash('success', 'Updated!');
-//            return res.redirect('back');
-//        });
-//    }else{
-//        req.flash('error', 'Unauthorized!');
-//        return res.status(401).send('Unauthorized');
-//    }*/
-//    let user = await User.findById(req.params.id);
-//    console.log('manish', user);
-//    if(user._id == req.params.id){
-//        console.log('manish kumar', user);
-//        try{
-//             await User.uploadedAvatar(req,res,function(err){
-//                 if(err){
-//                     console.log('******Multer Error:',err);
-//                 }
-//                 user.name=req.body.name;
-//                 user.email=req.body.email;
-//                 if(req.file){
-                   
-//                   //  if(user.avatar){
-//                   //      fs.unlinkSync(path.join(__dirname,'..',user.avatar));
-//                   //  }
-                   
-                   
-//                    user.avatar=User.avatarPath+'/'+req.file.filename;
-
-//                 }
-//                 console.log('manish mishra', user);
-//                 user.save();
-//                 return res.redirect('back');
-//             })
-//        }catch(err){
-//            req.flash('error',err);
-//            return res.redirect('back');
-//        }
-//    }else{
-//        req.flash('error', 'Unauthorized!');
-//        return res.status(401).send('Unauthorized'); 
-//    }
-// }
 
 module.exports.updateProfile = async function(req, res){
       const token = req.cookies.token;
@@ -157,10 +113,6 @@ module.exports.createSession = async function(req, res){
       return res.cookie("token", token).json({
         message: 'User Login in Successfully',
       })
-      // return res.status(200).json({
-      //   message: 'User Login in Successfully',
-      //   data: data
-      // })
     }catch(err){
       console.log('error', err);
       return res.redirect('/users/sigin-in'); 
@@ -170,7 +122,6 @@ module.exports.createSession = async function(req, res){
 
 
 module.exports.destroySession = async function(req, res){
-  //this functionality provides by passport.js (req.logout)
 
      // Clear the user's session data
     try{
@@ -179,6 +130,8 @@ module.exports.destroySession = async function(req, res){
             console.error('Error in logging out:', err);
             return;
           }
+          res.clearCookie('token'); // Replace 'cookieName' with the actual name of your cookie
+
           // Redirect to the home page or any other destination after logout
           // req.flash('success', 'You have logged out!');
           return res.status(200).redirect('/users/sign-up');
