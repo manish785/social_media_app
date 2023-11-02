@@ -9,8 +9,8 @@ const secret = 'Manish@9876';
 
 
 
-module.exports.usersCreateComment = async (req, res) => {
-  const post = await Post.findById(req.params.id); 
+module.exports.createComment = async (req, res) => {
+  const post = await Post.findById(req.params.postId); 
 
   return res.render('user_create_comment', {
       title: 'Create Comment',
@@ -19,7 +19,7 @@ module.exports.usersCreateComment = async (req, res) => {
 };
 
 
-module.exports.create = async function(req, res){
+module.exports.commentsCreated = async function(req, res){
 
   const token = req.cookies.token;
 
@@ -52,7 +52,7 @@ module.exports.create = async function(req, res){
     //       console.log('error', err);
     //   });
     try {
-      const post = await Post.findById(req.params.id);
+      const post = await Post.findById(req.params.postId);
       // console.log('elon bhai1', post);
 
       if (!token) {
@@ -130,7 +130,8 @@ module.exports.updateComment = async function(req, res){
 
     if(comment){
       comment.content = content;
-      
+      await comment.save();
+
       return res.status(200).json({
         data: {
           comment: comment.content,
@@ -145,7 +146,7 @@ module.exports.updateComment = async function(req, res){
   }      
 }
 
-module.exports.destroy = async function(req, res){
+module.exports.destroyComment = async function(req, res){
   const token = req.cookies.token;
 
   try{
